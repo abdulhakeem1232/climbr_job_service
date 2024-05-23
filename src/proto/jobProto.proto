@@ -1,0 +1,96 @@
+syntax = "proto3";
+
+service JobServices {
+    rpc CreateJob(JobPost) returns (JobPostResposne){};
+    rpc GetJob(GetJobRequest) returns (GetJobResponse){};
+    rpc GetAllJob(Empty) returns (GetJobResponse){};
+    rpc GetsingleJob(SingleJobId) returns (ResponseJobPost){};
+    rpc ApplyJob(Applicant) returns (ApplicantResponse){};
+}
+
+message Empty {
+
+}
+
+message skills {
+    string skills = 1;
+}
+
+message FileDetails {
+  string originalname = 1;
+  string encoding = 2;
+  string mimetype = 3;
+  bytes buffer = 4; 
+  int64 size = 5;
+}
+
+message apllicants {
+    string userId = 1;
+    string name = 2;
+    string email = 3;
+    string mobile = 4;
+    FileDetails cv = 5;
+}
+
+message JobPost {
+    string jobtitle = 1;
+    string CompanyName = 2;
+    int32 MinExperienceLevel = 3;
+    int32 MaxExperienceLevel = 4;
+    int32 Minimumsalary = 5;
+    int32 Maximumsalary = 6;
+    string joblocation = 7;
+    string RequiredSkills = 8;
+    FileDetails companylogo = 9;
+    string EmploymentType = 10;
+    string Description = 11;
+    string userId = 12;
+    repeated apllicants applicants = 13;
+}
+
+message JobPostResposne {
+    bool success = 1;
+}
+
+message GetJobRequest {
+    string userId = 1;
+}
+
+message GetJobResponse {
+    repeated ResponseJobPost jobs = 1;
+}
+
+message ResponseJobPost{
+    string jobrole = 1;
+    string companyname = 2;
+    int32 minexperience = 3;
+    int32 maxexperience = 4;
+    repeated apllicants applicants = 5;
+    int32 minsalary = 6;
+    int32 maxsalary = 7;
+    string joblocation = 8;
+    string skills = 9;
+    string emptype = 10;
+    string description = 11;
+    string image = 12;
+    string createdAt = 13;
+    string _id = 14;
+}
+
+message SingleJobId {
+    string id = 1;
+}
+
+message Applicant {
+    string jobid = 1;
+    string username = 2;
+    string email = 3;
+    string mobile = 4;
+    FileDetails cv = 5;
+    string userid = 6;
+}
+
+message ApplicantResponse {
+    bool success = 1;
+}
+

@@ -1,12 +1,29 @@
 {
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.577.0",
+    "@aws-sdk/middleware-endpoint": "^3.374.0",
+    "@aws-sdk/s3-request-presigner": "^3.577.0",
     "@grpc/grpc-js": "^1.10.8",
     "@grpc/proto-loader": "^0.7.13",
+    "@types/aws-sdk": "^2.7.0",
     "@types/express": "^4.17.21",
     "@types/mongoose": "^5.11.97",
+    "crypto": "^1.0.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "mongoose": "^8.4.0",
-    "nodemon": "^3.1.0"
-  }
+    "nodemon": "^3.1.0",
+    "sharp": "^0.33.4"
+  },
+  "name": "jobpost_service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon src/server.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
 }
