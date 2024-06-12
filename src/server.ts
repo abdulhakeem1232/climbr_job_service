@@ -33,6 +33,9 @@ server.addService(jobProto.JobServices.service, {
     GetAllJob: jobController.getalljob,
     GetsingleJob: jobController.getsinglejob,
     ApplyJob: jobController.applyjob,
+    DeleteJob: jobController.deleteJob,
+    UpdateJob: jobController.updateJob,
+
 })
 
 grpcServer();

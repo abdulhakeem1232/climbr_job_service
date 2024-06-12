@@ -6,6 +6,7 @@ export interface Applicant {
     email: string;
     mobile: string;
     cvPath: string;
+    status: string;
 }
 export interface JOB extends Document {
     jobrole: string;
@@ -14,6 +15,7 @@ export interface JOB extends Document {
     maxexperience: string;
     minsalary: string;
     maxsalary: string;
+    category: string;
     joblocation: string;
     emptype: string
     skills: string[];
@@ -21,6 +23,7 @@ export interface JOB extends Document {
     image: string;
     applicants: Applicant[];
     recruiterId: mongoose.Types.ObjectId;
+    isDeleted: boolean;
     createdAt: Date;
 }
 
@@ -50,6 +53,10 @@ const JobSchema: Schema<JOB> = new Schema({
         required: true
     },
     joblocation: {
+        type: String,
+        required: true
+    },
+    category: {
         type: String,
         required: true
     },
@@ -86,12 +93,19 @@ const JobSchema: Schema<JOB> = new Schema({
         },
         cv: {
             type: String,
+        },
+        status: {
+            type: String,
         }
     }],
     recruiterId: {
         type: Schema.Types.ObjectId,
         ref: "User",
         required: true
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
     createdAt: { type: Date, default: Date.now }
 })

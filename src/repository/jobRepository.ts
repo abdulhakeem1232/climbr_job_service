@@ -28,7 +28,7 @@ export const jobRepositiory = {
                 image: image,
                 recruiterId: data.userId,
             })
-            return true
+            return { success: true, message: 'Job created successfully' }
         } catch (err) {
             console.error(`Error creating job: ${err}`);
             return null;
@@ -36,7 +36,7 @@ export const jobRepositiory = {
     },
     getjobs: async (userId: string) => {
         try {
-            let jobs = await JobModel.find({ recruiterId: userId })
+            let jobs = await JobModel.find({ recruiterId: userId, isDeleted: { $ne: true } })
             console.log(jobs);
             let response = { jobs: jobs || [] }
             return response
@@ -47,7 +47,7 @@ export const jobRepositiory = {
     },
     getalljobs: async () => {
         try {
-            let jobs = await JobModel.find().sort({ createdAt: -1 })
+            let jobs = await JobModel.find({ isDeleted: { $ne: true } }).sort({ createdAt: -1 })
             console.log(jobs);
             let response = { jobs: jobs || [] }
             return response
@@ -96,4 +96,59 @@ export const jobRepositiory = {
             throw err
         }
     },
+    deleteJob: async (postId: string) => {
+        try {
+            let deletedJob = await JobModel.updateOne({ _id: postId }, { $set: { isDeleted: true } });
+            if (deletedJob.modifiedCount > 0) {
+
+                return { success: true, message: 'Job deleted successfully' };
+            } else {
+                return { success: false, message: 'Job not found' };
+            }
+        } catch (err) {
+            console.error('Error while delete job:', err)
+            throw err
+        }
+    },
+    updatejobJob: async (data: any) => {
+        try {
+            let skills = data.RequiredSkills.includes(',') ? data.RequiredSkills.split(',') : data.RequiredSkills
+            let response = await JobModel.updateOne({ _id: data.id }, {
+                $set: {
+                    jobrole: data.jobtitle,
+                    companyname: data.CompanyName,
+                    minexperience: data.MinExperienceLevel,
+                    maxexperience: data.MaxExperienceLevel,
+                    minsalary: data.Minimumsalary,
+                    maxsalary: data.Maximumsalary,
+                    joblocation: data.joblocation,
+                    emptype: data.EmploymentType,
+                    skills: skills,
+                    description: data.Description,
+                    recruiterId: data.userId,
+                }
+            });
+            console.log(response, '0000000');
+
+            if (response.modifiedCount > 0) {
+                return { success: true, message: 'Job updated successfully' };
+            } else {
+                return { success: false, message: 'No job was updated' };
+            }
+
+        } catch (err) {
+            console.error('Error while delete job:', err)
+            throw err
+        }
+    },
+    getSkills: async (jobid: string) => {
+        try {
+            let skills = await JobModel.findOne({ _id: jobid }, { skills: 1 })
+            return skills
+        }
+        catch (err) {
+            console.error('Error while skilld from job:', err)
+            throw err
+        }
+    }
 }

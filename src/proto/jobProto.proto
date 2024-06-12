@@ -6,6 +6,9 @@ service JobServices {
     rpc GetAllJob(Empty) returns (GetJobResponse){};
     rpc GetsingleJob(SingleJobId) returns (ResponseJobPost){};
     rpc ApplyJob(Applicant) returns (ApplicantResponse){};
+    rpc DeleteJob(DeleteJobRequest) returns (JobPostResposne){};
+    rpc UpdateJob(JobPost) returns (JobPostResposne){};
+    rpc FilterJob(JobFilters) returns (GetJobResponse){};
 }
 
 message Empty {
@@ -29,7 +32,8 @@ message apllicants {
     string name = 2;
     string email = 3;
     string mobile = 4;
-    FileDetails cv = 5;
+    string cv = 5;
+    string status = 6;
 }
 
 message JobPost {
@@ -46,10 +50,13 @@ message JobPost {
     string Description = 11;
     string userId = 12;
     repeated apllicants applicants = 13;
+    string id = 14;
 }
 
 message JobPostResposne {
     bool success = 1;
+    string message = 2;
+
 }
 
 message GetJobRequest {
@@ -92,5 +99,18 @@ message Applicant {
 
 message ApplicantResponse {
     bool success = 1;
+}
+
+message DeleteJobRequest {
+    string postId = 1;
+}
+message JobFilters {
+  bool onsite_full_time = 1;
+  bool remote_full_time = 2;
+  bool onsite_part_time = 3;
+  bool remote_part_time = 4;
+  bool back_end_developer = 5;
+  bool front_end_developer = 6;
+  bool full_stack_developer = 7;
 }
 

@@ -15,7 +15,7 @@ export const jobController = {
         try {
             const UserId = call.request.userId;
             let jobs = await jobServices.getJob(UserId)
-            console.log('hoo', jobs);
+            // console.log('hoo', jobs);
             callback(null, jobs)
         } catch (err) {
             callback(err);
@@ -57,9 +57,29 @@ export const jobController = {
                 cv: call.request.cv,
             }
             let response = await jobServices.applyjob(userData)
+            // callback(null, response)
+        } catch (err) {
+            callback(err);
+        }
+    },
+    deleteJob: async (call: any, callback: any) => {
+        try {
+            const { postId } = call.request;
+            let response = await jobServices.deleteJob(postId)
             callback(null, response)
         } catch (err) {
             callback(err);
         }
     },
-}
+    updateJob: async (call: any, callback: any) => {
+        try {
+            console.log(call.request);
+            const data = call.request
+            let response = await jobServices.updatejob(data)
+            callback(null, response)
+        } catch (err) {
+            callback(err);
+        }
+    },
+
+} 
