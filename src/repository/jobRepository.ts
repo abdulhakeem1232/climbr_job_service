@@ -6,6 +6,7 @@ export interface UserData {
     email: string;
     mobile: string;
     cv: string;
+    status?: string;
 }
 
 
@@ -76,11 +77,11 @@ export const jobRepositiory = {
             }
             const applicant = {
                 userId: data.userId,
-
                 name: data.name,
                 email: data.email,
                 mobile: data.mobile,
-                cv: data.cv
+                cv: data.cv,
+                status: data.cv
             };
             let job = await JobModel.findOne({ _id: data.jobid })
             let response = await JobModel.updateOne({ _id: data.jobid }, { $addToSet: { applicants: applicant } })
@@ -150,5 +151,57 @@ export const jobRepositiory = {
             console.error('Error while skilld from job:', err)
             throw err
         }
-    }
+    },
+    getChartDetails: async (currentYear: number, month: number) => {
+        try {
+            const userStats = await JobModel.aggregate([
+                {
+                    $match: {
+                        $expr: {
+                            $eq: [{ $year: "$createdAt" }, currentYear]
+                        },
+                        isDeleted: {
+                            $ne: true
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            month: { $month: "$createdAt" },
+                        },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $sort: {
+                        "_id.month": 1
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        month: "$_id.month",
+                        count: 1
+                    }
+                }
+
+            ])
+            const result = Array.from({ length: month + 1 }, (_, i) => ({
+                month: i + 1,
+                count: 0
+            }));
+            userStats.forEach(stat => {
+                const index = result.findIndex(r => r.month == stat.month);
+                if (index !== -1) {
+                    result[index].count = stat.count;
+                }
+            });
+            let count = await JobModel.find({ isDeleted: { $ne: true } }).countDocuments();
+            return { result, count }
+        } catch (err) {
+            console.error(`Error fetching chart: ${err}`);
+            return null;
+        }
+    },
 }

@@ -81,5 +81,15 @@ export const jobController = {
             callback(err);
         }
     },
+    getChartData: async (call: any, callback: any) => {
+        try {
+            const currentYear = new Date().getFullYear()
+            const month = new Date().getMonth()
+            let response = await jobServices.getChartDetails(currentYear, month)
+            callback(null, response)
+        } catch (err) {
+            callback(err)
+        }
 
-} 
+    },
+}

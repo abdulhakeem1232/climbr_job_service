@@ -1,8 +1,6 @@
 import { S3Client, PutObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { jobRepositiory } from "../repository/jobRepository";
-import Tesseract from 'tesseract.js'
-import { PDFImage } from 'pdf-image'
 import dotenv from 'dotenv'
 import crypto from 'crypto'
 import sharp from 'sharp'
@@ -16,10 +14,6 @@ const access_key = process.env.ACCESS_KEY
 const secret_access_key = process.env.SECRET_ACCESS_KEY
 const bucket_region = process.env.BUCKET_REGION
 const bucket_name = process.env.BUCKET_NAME
-
-
-
-
 
 const s3: S3Client = new S3Client({
     credentials: {
@@ -55,10 +49,7 @@ export const jobServices = {
             if (data) {
                 const { jobs } = data
                 for (let job of jobs) {
-                    console.log('op', job._id);
                     const updatedApplicants = await Promise.all(job.applicants.map(async (user: any) => {
-                        console.log(user, 'user00000000---0000');
-
                         const getObjectParams = {
                             Bucket: bucket_name,
                             Key: user.cv,
@@ -66,7 +57,6 @@ export const jobServices = {
 
                         const getObjectCommand = new GetObjectCommand(getObjectParams);
                         const url = await getSignedUrl(s3, getObjectCommand, { expiresIn: 3600 });
-                        console.log(url, 'rererere');
                         user.cv = url
                         return user
                     }))
@@ -83,7 +73,6 @@ export const jobServices = {
     getallJob: async () => {
         try {
             let jobs = await jobRepositiory.getalljobs()
-            console.log(jobs, 'service');
             if (jobs?.jobs) {
                 for (let job of jobs?.jobs) {
                     const getObjectParams = {
@@ -93,7 +82,6 @@ export const jobServices = {
                     const getObjectCommand = new GetObjectCommand(getObjectParams);
                     const url = await getSignedUrl(s3, getObjectCommand, { expiresIn: 3600 });
                     job.image = url
-                    console.log(url);
                 }
             }
             return jobs
@@ -105,7 +93,6 @@ export const jobServices = {
     getsingleJob: async (id: string) => {
         try {
             let jobs = await jobRepositiory.getsinglejobs(id)
-            console.log(jobs, 'service');
             return jobs
         } catch (err) {
             console.error(`Error jobs: ${err}`);
@@ -131,15 +118,13 @@ export const jobServices = {
                 const numMatchedSkills = matchedSkills.filter((matched: any) => matched).length;
                 const percentMatch = (numMatchedSkills / totalRequiredSkills) * 100;
                 console.log(`Percent Skill Match: ${percentMatch}%`);
-                percentMatch > 70 ? UserData.status = 'applied' : 'rejecetd'
+                percentMatch > 70 ? UserData.status = 'Applied' : 'Rejecetd'
             }
             const command = new PutObjectCommand(params)
             await s3.send(command);
             UserData.cv = name
             let response = await jobRepositiory.saveApllicants(UserData)
             return response
-
-
         } catch (err) {
             console.error('Error while saving Applicants:', err)
             throw err
@@ -161,6 +146,14 @@ export const jobServices = {
         } catch (err) {
             console.error('Error while deleteing job post:', err)
             throw err
+        }
+    },
+    getChartDetails: async (year: number, month: number) => {
+        try {
+            let response = await jobRepositiory.getChartDetails(year, month)
+            return response
+        } catch (err) {
+            throw new Error(`Failed to sign up: ${err}`);
         }
     },
 }

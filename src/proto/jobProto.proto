@@ -9,6 +9,8 @@ service JobServices {
     rpc DeleteJob(DeleteJobRequest) returns (JobPostResposne){};
     rpc UpdateJob(JobPost) returns (JobPostResposne){};
     rpc FilterJob(JobFilters) returns (GetJobResponse){};
+    rpc GetReports(Empty) returns (GetJobStatsResponse){};
+
 }
 
 message Empty {
@@ -114,3 +116,12 @@ message JobFilters {
   bool full_stack_developer = 7;
 }
 
+message MonthStats {
+    int32 month = 1;
+    int32 count = 2;
+}
+
+message GetJobStatsResponse {
+    repeated MonthStats result = 1;
+    string count = 2;
+}

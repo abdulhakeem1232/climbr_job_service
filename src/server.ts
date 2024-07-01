@@ -35,6 +35,7 @@ server.addService(jobProto.JobServices.service, {
     ApplyJob: jobController.applyjob,
     DeleteJob: jobController.deleteJob,
     UpdateJob: jobController.updateJob,
+    GetReports: jobController.getChartData,
 
 })
 
