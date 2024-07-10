@@ -1,4 +1,6 @@
+import { status } from "@grpc/grpc-js";
 import JobModel from "../models/jobModel";
+const mongoose = require('mongoose');
 export interface UserData {
     jobid: string;
     userId: string;
@@ -81,7 +83,7 @@ export const jobRepositiory = {
                 email: data.email,
                 mobile: data.mobile,
                 cv: data.cv,
-                status: data.cv
+                status: data.status
             };
             let job = await JobModel.findOne({ _id: data.jobid })
             let response = await JobModel.updateOne({ _id: data.jobid }, { $addToSet: { applicants: applicant } })
@@ -90,7 +92,7 @@ export const jobRepositiory = {
             if (response.modifiedCount == 0) {
                 throw new Error('No documents were matched or modified during update operation.');
             }
-            return true
+            return { success: true, status: data.status }
 
         } catch (err) {
             console.error('Error while saving Applicants:', err)
@@ -204,4 +206,95 @@ export const jobRepositiory = {
             return null;
         }
     },
+    getApplicantsChartDetails: async (currentYear: number, month: number, userId: string) => {
+        try {
+            const userStats = await JobModel.aggregate([
+                {
+                    $match: {
+                        recruiterId: new mongoose.Types.ObjectId(userId),
+                        isDeleted: { $ne: true }
+                    }
+                },
+                {
+                    $unwind: "$applicants"
+                },
+                {
+                    $match: {
+                        $expr: {
+                            $eq: [{ $year: "$applicants.createdAt" }, currentYear]
+                        }
+                    }
+                },
+                {
+                    $group: {
+                        _id: {
+                            month: { $month: "$applicants.createdAt" }
+                        },
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $sort: {
+                        "_id.month": 1
+                    }
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        month: "$_id.month",
+                        count: 1
+                    }
+                }
+            ])
+            const result = Array.from({ length: month + 1 }, (_, i) => ({
+                month: i + 1,
+                count: 0
+            }));
+            userStats.forEach(stat => {
+                const index = result.findIndex(r => r.month == stat.month);
+                if (index !== -1) {
+                    result[index].count = stat.count;
+                }
+            });
+            let count = await JobModel.find({ $and: [{ isDeleted: { $ne: true } }, { recruiterId: userId }] }).countDocuments();
+            const jobs = await JobModel.find({
+                isDeleted: { $ne: true },
+                recruiterId: userId
+            });
+            let totalApllicants = jobs.reduce((acc, cur) => acc + cur.applicants.length, 0)
+            return { result, count, totalApllicants }
+        } catch (err) {
+            console.error(`Error fetching chart: ${err}`);
+            return null;
+        }
+    },
+    getApplicants: async (jobId: string) => {
+        try {
+            let jobApplicants = await JobModel.findOne({ _id: jobId }, { applicants: 1, _id: 0 })
+            return jobApplicants
+        } catch (err) {
+            console.error(`Error creating job: ${err}`);
+            return null;
+        }
+    },
+    updateStatus: async (jobId: string, userId: string, status: string) => {
+        try {
+            let job = await JobModel.findOne({ _id: jobId });
+            if (!job) {
+                throw new Error(`Job with ID ${jobId} not found`);
+            }
+
+            job.applicants.forEach((applicant) => {
+                if (applicant.userId == userId) {
+                    applicant.status = status
+                }
+            })
+            job.save();
+            return { success: true, message: "Successfully Status Changed" }
+        } catch (err) {
+            console.error(`Error creating job: ${err}`);
+            return null;
+        }
+    }
+
 }

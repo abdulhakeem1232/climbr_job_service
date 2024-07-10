@@ -90,6 +90,36 @@ export const jobController = {
         } catch (err) {
             callback(err)
         }
-
     },
+    getApplicantsChartData:
+        async (call: any, callback: any) => {
+            try {
+                const currentYear = new Date().getFullYear()
+                const month = new Date().getMonth()
+                const { userId } = call.request
+                let response = await jobServices.getApplicantsChartDetails(currentYear, month, userId)
+                callback(null, response)
+            } catch (err) {
+                callback(err)
+            }
+        },
+    getApplicants: async (call: any, callback: any) => {
+        try {
+            const { id } = call.request
+            let response = await jobServices.getApplicants(id)
+            callback(null, response)
+        } catch (err) {
+            callback(err)
+        }
+    },
+    statusUpdate: async (call: any, callback: any) => {
+        try {
+            const { jobId, userId, status } = call.request
+            let response = await jobServices.updateStatus(jobId, userId, status)
+            callback(null, response)
+        } catch (err) {
+            callback(err)
+        }
+    },
+
 }

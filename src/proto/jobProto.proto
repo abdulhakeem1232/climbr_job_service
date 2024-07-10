@@ -10,7 +10,9 @@ service JobServices {
     rpc UpdateJob(JobPost) returns (JobPostResposne){};
     rpc FilterJob(JobFilters) returns (GetJobResponse){};
     rpc GetReports(Empty) returns (GetJobStatsResponse){};
-
+    rpc GetApplicantsReports(GetJobRequest) returns (GetJobStatsResponse){};
+    rpc GetApplicants(SingleJobId) returns (ViewApplicants){};
+    rpc ChangeStatus(StatusUpdate) returns (JobPostResposne){};
 }
 
 message Empty {
@@ -29,6 +31,12 @@ message FileDetails {
   int64 size = 5;
 }
 
+message StatusUpdate {
+    string jobId = 1;
+    string userId = 2;
+    string status = 3;
+}
+
 message apllicants {
     string userId = 1;
     string name = 2;
@@ -36,6 +44,12 @@ message apllicants {
     string mobile = 4;
     string cv = 5;
     string status = 6;
+}
+
+message ViewApplicants {
+    string _id = 1;
+    repeated apllicants applicants = 2;
+
 }
 
 message JobPost {
@@ -101,6 +115,7 @@ message Applicant {
 
 message ApplicantResponse {
     bool success = 1;
+    string status = 2;
 }
 
 message DeleteJobRequest {
@@ -124,4 +139,5 @@ message MonthStats {
 message GetJobStatsResponse {
     repeated MonthStats result = 1;
     string count = 2;
+    string totalApllicants = 3;
 }

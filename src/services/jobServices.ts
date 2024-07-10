@@ -156,4 +156,39 @@ export const jobServices = {
             throw new Error(`Failed to sign up: ${err}`);
         }
     },
+    getApplicantsChartDetails: async (year: number, month: number, userId: string) => {
+        try {
+            let response = await jobRepositiory.getApplicantsChartDetails(year, month, userId)
+            return response
+        } catch (err) {
+            throw new Error(`Failed to sign up: ${err}`);
+        }
+    },
+    getApplicants: async (id: string) => {
+        try {
+            let response = await jobRepositiory.getApplicants(id)
+            if (response) {
+                for (let appllicant of response.applicants) {
+                    const getObjectParams = {
+                        Bucket: bucket_name,
+                        Key: appllicant.cv,
+                    }
+                    const getObjectCommand = new GetObjectCommand(getObjectParams);
+                    const url = await getSignedUrl(s3, getObjectCommand, { expiresIn: 3600 });
+                    appllicant.cv = url
+                }
+            }
+            return response
+        } catch (err) {
+            throw new Error(`Failed to sign up: ${err}`);
+        }
+    },
+    updateStatus: async (jobId: string, userId: string, status: string) => {
+        try {
+            let response = await jobRepositiory.updateStatus(jobId, userId, status)
+            return response
+        } catch (err) {
+            throw new Error(`Failed to change Applicants status ${err}`);
+        }
+    }
 }

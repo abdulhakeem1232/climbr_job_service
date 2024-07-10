@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  jobpost-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${JOB_PORT}:${JOB_PORT}"
+    env_file:
+      - .env
+    networks:
+      - climbr_network
+
+networks:
+  climbr_network:
+    driver: bridge

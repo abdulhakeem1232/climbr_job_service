@@ -1,12 +1,14 @@
 import mongoose, { Document, Schema } from "mongoose";
 
 export interface Applicant {
+    cv: any;
     userId: string;
     name: string;
     email: string;
     mobile: string;
     cvPath: string;
     status: string;
+    createdAt: Date;
 }
 export interface JOB extends Document {
     jobrole: string;
@@ -56,10 +58,6 @@ const JobSchema: Schema<JOB> = new Schema({
         type: String,
         required: true
     },
-    category: {
-        type: String,
-        required: true
-    },
     emptype: {
         type: String,
         required: true,
@@ -96,6 +94,10 @@ const JobSchema: Schema<JOB> = new Schema({
         },
         status: {
             type: String,
+        },
+        createdAt: {
+            type: Date,
+            default: Date.now
         }
     }],
     recruiterId: {
