@@ -86,6 +86,18 @@ export const jobRepositiory = {
                 status: data.status
             };
             let job = await JobModel.findOne({ _id: data.jobid })
+            if (!job) {
+                throw new Error('Job not found.');
+            }
+
+            const alreadyApplied = job.applicants.some(app => app.userId.toString() === data.userId);
+
+            if (alreadyApplied) {
+                return {
+                    success: false,
+                    status: 'Applicant has already applied for this job.'
+                };
+            }
             let response = await JobModel.updateOne({ _id: data.jobid }, { $addToSet: { applicants: applicant } })
             console.log(response, data, 'repo00000', job);
 
